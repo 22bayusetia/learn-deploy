@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    image: myapp_web_image:latest  # Replace with your Docker image name
+    command: bash -c 'while !</dev/tcp/db/1433; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0'
+    volumes:
+      - .:/app
+    ports:
+      - 8008:8008
+    environment:
+      - DATABASE_URL=mssql+pyodbc://fastapi_traefik:YourStrong!Passw0rd@db:1433/fastapi_traefik?driver=ODBC+Driver+17+for+SQL+Server
+    depends_on:
+      - db
+  db:
+    image: mcr.microsoft.com/mssql/server:latest
+    ports:
+      - "1430:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+      - MSSQL_PID=Express
